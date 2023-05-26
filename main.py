@@ -95,12 +95,12 @@ if __name__ == '__main__':
     slackbot = Slack(token=os.getenv("SLACK_TOKEN", None))
     holidays = Holidays()
 
-    next_week = date.today() + timedelta(days=3)
+    next_week = date.today() + timedelta(days=3)  # TODO Change hardcoded timedelta to "next monday"
 
     all_holidays = holidays.get(year=next_week, state="BY")
 
     for name, data in all_holidays.items():
-        if data["datum"] == str(next_week):
+        if data["datum"] == str(next_week):  # TODO Change this so that it checks over all days of the next week for upcoming holidays
             date = datetime.strptime(data["datum"], '%Y-%m-%d').strftime('%d.%m.%y')
             if not data["hinweis"]:
                 text = f"Nächster Feiertag: {name} am {date}"
