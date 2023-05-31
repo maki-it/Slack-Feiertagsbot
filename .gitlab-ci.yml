@@ -5,15 +5,15 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  - apt-get update
-  - apt-get install -y locales
-  - TZ=Europe/Berlin
-  - export LANG="de_DE.UTF-8"
-  - export LC_ALL="de_DE.UTF-8"
-  - export LC_CTYPE="de_DE.UTF-8"
 
 run:
   script:
+    - apt-get update
+    - apt-get install -y locales locales-all
+    - TZ=Europe/Berlin
+    - export LANG="de_DE.UTF-8"
+    - export LANGUAGE="de_DE.UTF-8"
+    - export LC_ALL="de_DE.UTF-8""
     - pip install -r requirements.txt
     - python3 main.py
 
