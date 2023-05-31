@@ -1,12 +1,13 @@
-image: python:alpine3.18
+image: python:3.18
 
 before_script:
   - python --version ; pip --version  # For debugging
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  - apk add --update musl musl-utils musl-locales tzdata locale
+  - apt-get install -y locales
   - TZ=Europe/Berlin
+  - export LANG="de_DE.UTF-8"
   - export LC_ALL="de_DE.UTF-8"
   - export LC_CTYPE="de_DE.UTF-8"
 
