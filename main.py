@@ -2,7 +2,7 @@ import os
 import re
 import ssl
 from datetime import timedelta, date, datetime
-
+import locale
 import certifi
 import requests
 from slack import WebClient
@@ -10,6 +10,7 @@ from slack import WebClient
 
 class Holidays:
     def __init__(self):
+        current_year = datetime.now().year
         self.url = "https://feiertage-api.de/api/"
         self.valid_states = {
             "NATIONAL": "National holidays",
@@ -29,6 +30,28 @@ class Holidays:
             "ST": "Sachsen-Anhalt",
             "SH": "Schleswig-Holstein",
             "TH": "Thüringen"
+        }
+        self.seasons = [
+            ('winter', (date(current_year,  1,  1),  date(current_year,  3, 20))),
+            ('spring', (date(current_year,  3, 21),  date(current_year,  6, 20))),
+            ('summer', (date(current_year,  6, 21),  date(current_year,  9, 22))),
+            ('autumn', (date(current_year,  9, 23),  date(current_year, 12, 20))),
+            ('winter', (date(current_year, 12, 21),  date(current_year, 12, 31)))
+        ]
+        self.seasons_emojis = {
+            'winter':  '❄️',
+            'spring': '🌱',
+            'summer': '🌞',
+            'autumn': '🍂'
+        }
+        self.emojis = {
+            'Weihnachtstag':  '🎅',
+            'Ostermontag': '🐰',
+            'Tag der Arbeit': '🛠️',
+            'Christi Himmelfahrt': '✝️',
+            'Tag der Deutschen Einheit': '🇩🇪',
+            'Neujahrstag': '🎆',
+            'Heilige Drei Könige': '👑'
         }
 
     def validate_state(self, state: str) -> bool | Exception:
@@ -78,6 +101,21 @@ class Holidays:
 
         return requests.get(f"{self.url}?jahr={year}&{state_param}").json()
 
+    def get_season(self, now: date | datetime = date.today()):
+        """ Get season from given date or datetime
+
+        :param now:
+        :return:
+        """
+
+        try:
+            if isinstance(now, datetime):
+                now = now.date()
+            print(now)
+            return next(season for season, (start, end) in self.seasons if start <= now <= end)
+        except Exception as e:
+            print(f"{holiday_date}", e)
+
 
 class Slack:
     def __init__(self, token: str | None = None):
@@ -94,18 +132,34 @@ class Slack:
 if __name__ == '__main__':
     slackbot = Slack(token=os.getenv("SLACK_TOKEN", None))
     holidays = Holidays()
+    locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
 
-    next_week = date.today() + timedelta(days=3)  # TODO Change hardcoded timedelta to "next monday"
-
+    current_date = datetime.today()
+    next_week = current_date.date() + timedelta(weeks=1)
     all_holidays = holidays.get(year=next_week, state="BY")
+    text = ""
 
     for name, data in all_holidays.items():
-        if data["datum"] == str(next_week):  # TODO Change this so that it checks over all days of the next week for upcoming holidays
-            date = datetime.strptime(data["datum"], '%Y-%m-%d').strftime('%d.%m.%y')
-            if not data["hinweis"]:
-                text = f"Nächster Feiertag: {name} am {date}"
-            else:
-                text = f"Nächster Feiertag: {name} am {data['datum']}\nHinweis: {date}"
+        holiday_date = datetime.strptime(data["datum"], "%Y-%m-%d").date()
+        holiday_season = holidays.get_season(holiday_date)
 
-            print(name, data["datum"], data["hinweis"])
-            slackbot.post(channel=os.getenv("SLACK_CHANNEL", "holiday-test"), message=text)
+        # print(holidays.seasons_emojis[holiday_season], name)
+
+        if current_date.date() - timedelta(weeks=1) < holiday_date <= next_week:
+            date = datetime.strptime(data["datum"], '%Y-%m-%d')
+            day_name = date.strftime("%A")
+            date_converted = date.strftime('%d.%m.%Y')
+
+            if name in holidays.emojis:
+                emoji = holidays.emojis[name]
+            else:
+                emoji = holidays.seasons_emojis[holiday_season]
+
+            if not data["hinweis"]:
+                text += f"{emoji} {name} am {day_name}, {date_converted}\n"
+            else:
+                text += f"{emoji} {name} am {day_name}, {date_converted}\n> _{data['hinweis']}_\n"
+
+    if text:
+        text = f"*Feiertage nächste Woche*\n{text}"
+        slackbot.post(channel=os.getenv("SLACK_CHANNEL", "holiday-test"), message=text)
