@@ -1,8 +1,9 @@
+import locale
 import os
 import re
 import ssl
 from datetime import timedelta, date, datetime
-import locale
+
 import certifi
 import requests
 from slack import WebClient
@@ -32,20 +33,20 @@ class Holidays:
             "TH": "Thüringen"
         }
         self.seasons = [
-            ('winter', (date(current_year,  1,  1),  date(current_year,  3, 20))),
-            ('spring', (date(current_year,  3, 21),  date(current_year,  6, 20))),
-            ('summer', (date(current_year,  6, 21),  date(current_year,  9, 22))),
-            ('autumn', (date(current_year,  9, 23),  date(current_year, 12, 20))),
-            ('winter', (date(current_year, 12, 21),  date(current_year, 12, 31)))
+            ('winter', (date(current_year, 1, 1), date(current_year, 3, 20))),
+            ('spring', (date(current_year, 3, 21), date(current_year, 6, 20))),
+            ('summer', (date(current_year, 6, 21), date(current_year, 9, 22))),
+            ('autumn', (date(current_year, 9, 23), date(current_year, 12, 20))),
+            ('winter', (date(current_year, 12, 21), date(current_year, 12, 31)))
         ]
         self.seasons_emojis = {
-            'winter':  '❄️',
+            'winter': '❄️',
             'spring': '🌱',
             'summer': '🌞',
             'autumn': '🍂'
         }
         self.emojis = {
-            'Weihnachtstag':  '🎅',
+            'Weihnachtstag': '🎅',
             'Ostermontag': '🐰',
             'Tag der Arbeit': '🛠️',
             'Christi Himmelfahrt': '✝️',
