@@ -131,13 +131,17 @@ class Slack:
 
 
 if __name__ == '__main__':
+
+    # Edit these lines to set the search range
+    timerange = timedelta(weeks=2)
+    search_start = datetime.today()
+    search_end = search_start.date() + timerange
+
     slackbot = Slack(token=os.getenv("SLACK_TOKEN", None))
     holidays = Holidays()
     locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
 
-    current_date = datetime.today()
-    next_week = current_date.date() + timedelta(weeks=1)
-    all_holidays = holidays.get(year=next_week, state="BY")
+    all_holidays = holidays.get(year=search_end, state="BY")
     text = ""
 
     for name, data in all_holidays.items():
@@ -146,7 +150,7 @@ if __name__ == '__main__':
 
         # print(holidays.seasons_emojis[holiday_season], name)
 
-        if current_date.date() - timedelta(weeks=1) < holiday_date <= next_week:
+        if search_start.date() < holiday_date <= search_end:
             date = datetime.strptime(data["datum"], '%Y-%m-%d')
             day_name = date.strftime("%A")
             date_converted = date.strftime('%d.%m.%Y')
@@ -162,5 +166,5 @@ if __name__ == '__main__':
                 text += f"{emoji} {name} am {day_name}, {date_converted}\n> _{data['hinweis']}_\n"
 
     if text:
-        text = f"*Feiertage nächste Woche*\n{text}"
+        text = f"*Anstehende Feiertage*\n{text}"
         slackbot.post(channel=os.getenv("SLACK_CHANNEL", "holiday-test"), message=text)
