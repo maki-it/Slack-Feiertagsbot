@@ -6,7 +6,7 @@ before_script:
   - virtualenv venv
   - source venv/bin/activate
   - apk add --update musl musl-utils musl-locales tzdata
-  - ENV TZ=Europe/Berlin
+  - TZ=Europe/Berlin
   - export LC_ALL="de_DE.UTF-8"
   - export LC_CTYPE="de_DE.UTF-8"
 
