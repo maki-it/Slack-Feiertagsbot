@@ -5,6 +5,7 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
+  - apt-get update
   - apt-get install -y locales
   - TZ=Europe/Berlin
   - export LANG="de_DE.UTF-8"
