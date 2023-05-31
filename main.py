@@ -132,7 +132,8 @@ class Slack:
 if __name__ == '__main__':
 
     # Edit these lines to set the search range
-    timerange = timedelta(weeks=2)
+    SEARCH_WEEKS = int(os.getenv("SEARCH_WEEKS", 2))
+    timerange = timedelta(weeks=SEARCH_WEEKS)
     search_start = datetime.today()
     search_end = search_start.date() + timerange
 
@@ -163,6 +164,6 @@ if __name__ == '__main__':
                 text += f"{emoji} {name} am {day_name}, {date_converted}\n> _{data['hinweis']}_\n"
 
     if text:
-        text = f"*Anstehende Feiertage:*\n{text}"
+        text = f"*Anstehende Feiertage der nächsten {SEARCH_WEEKS} Wochen:*\n{text}"
         print(text)
         slackbot.post(channel=os.getenv("SLACK_CHANNEL", "holiday-test"), message=text)
