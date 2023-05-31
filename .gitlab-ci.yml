@@ -5,7 +5,7 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  - apk add --update musl musl-utils musl-locales tzdata
+  - apk add --update musl musl-utils musl-locales tzdata locale
   - TZ=Europe/Berlin
   - export LC_ALL="de_DE.UTF-8"
   - export LC_CTYPE="de_DE.UTF-8"
