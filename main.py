@@ -112,7 +112,6 @@ class Holidays:
         try:
             if isinstance(now, datetime):
                 now = now.date()
-            print(now)
             return next(season for season, (start, end) in self.seasons if start <= now <= end)
         except Exception as e:
             print(f"{holiday_date}", e)
@@ -148,8 +147,6 @@ if __name__ == '__main__':
         holiday_date = datetime.strptime(data["datum"], "%Y-%m-%d").date()
         holiday_season = holidays.get_season(holiday_date)
 
-        # print(holidays.seasons_emojis[holiday_season], name)
-
         if search_start.date() < holiday_date <= search_end:
             date = datetime.strptime(data["datum"], '%Y-%m-%d')
             day_name = date.strftime("%A")
@@ -166,5 +163,6 @@ if __name__ == '__main__':
                 text += f"{emoji} {name} am {day_name}, {date_converted}\n> _{data['hinweis']}_\n"
 
     if text:
-        text = f"*Anstehende Feiertage*\n{text}"
+        text = f"*Anstehende Feiertage:*\n{text}"
+        print(text)
         slackbot.post(channel=os.getenv("SLACK_CHANNEL", "holiday-test"), message=text)
