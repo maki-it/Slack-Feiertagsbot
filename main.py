@@ -14,7 +14,7 @@ class Holidays:
         current_year = datetime.now().year
         self.url = "https://feiertage-api.de/api/"
         self.valid_states = {
-            "NATIONAL": "National holidays",
+            "NATIONAL": "Nationale Feiertage",
             "BW": "Baden-Württemberg",
             "BY": "Bayern",
             "BE": "Berlin",
@@ -94,7 +94,7 @@ class Holidays:
         self.validate_year(str(year))
 
         state_param = ""
-        if state is None:
+        if not state or state.upper() == "ALL":
             pass
         else:
             if self.validate_state(state.upper()):
@@ -130,18 +130,22 @@ class Slack:
 
 
 if __name__ == '__main__':
-
     # Edit these lines to set the search range
     SEARCH_WEEKS = int(os.getenv("SEARCH_WEEKS", 2))
     timerange = timedelta(weeks=SEARCH_WEEKS)
     search_start = datetime.today()
     search_end = search_start.date() + timerange
 
-    slackbot = Slack(token=os.getenv("SLACK_TOKEN", None))
+    slack_token = os.getenv("SLACK_TOKEN", None)
+    if slack_token:
+        slackbot = Slack(token=slack_token)
+    else:
+        raise ValueError("SLACK_TOKEN is undefined")
+
     holidays = Holidays()
     locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
 
-    all_holidays = holidays.get(year=search_end, state="BY")
+    all_holidays = holidays.get(year=search_end, state=os.getenv("STATE", None))
     text = ""
 
     for name, data in all_holidays.items():
