@@ -32,4 +32,4 @@ COPY main.py .
 
 USER 1000
 
-CMD ["env; python3 main.py"]
+CMD ["python3", "main.py"]
