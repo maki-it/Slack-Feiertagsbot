@@ -6,6 +6,7 @@ from datetime import timedelta, date, datetime
 
 import certifi
 import requests
+import slack.errors
 from slack import WebClient
 
 
@@ -201,4 +202,8 @@ if __name__ == '__main__':
 
     if text:
         print(text)
-        slackbot.post(channel=os.getenv("SLACK_CHANNEL", "holiday-test"), message=text)
+        try:
+            slackbot.post(channel=os.getenv("SLACK_CHANNEL", "holiday-test"), message=text)
+        except slack.errors.SlackApiError as e:
+            print(e, os.getenv("SLACK_CHANNEL", "holiday-test"))
+
