@@ -23,4 +23,5 @@ test:
   tags:
     - aws
   script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
     - docker run $CI_REGISTRY_IMAGE:latest
