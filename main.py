@@ -145,7 +145,7 @@ if __name__ == '__main__':
     holidays = Holidays()
     locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
 
-    state = os.getenv("STATE", None)
+    state = os.getenv("STATE", "ALL")
     all_holidays = holidays.get(year=search_end, state=state)
     text = ""
 
