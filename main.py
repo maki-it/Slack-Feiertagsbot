@@ -14,7 +14,7 @@ class Holidays:
         current_year = datetime.now().year
         self.url = "https://feiertage-api.de/api/"
         self.valid_states = {
-            "NATIONAL": "Nationale Feiertage",
+            "NATIONAL": "Deutschland",
             "BW": "Baden-Württemberg",
             "BY": "Bayern",
             "BE": "Berlin",
@@ -145,29 +145,60 @@ if __name__ == '__main__':
     holidays = Holidays()
     locale.setlocale(locale.LC_TIME, 'de_DE.UTF-8')
 
-    all_holidays = holidays.get(year=search_end, state=os.getenv("STATE", None))
+    state = os.getenv("STATE", None)
+    all_holidays = holidays.get(year=search_end, state=state)
     text = ""
 
-    for name, data in all_holidays.items():
-        holiday_date = datetime.strptime(data["datum"], "%Y-%m-%d").date()
-        holiday_season = holidays.get_season(holiday_date)
+    if state:
+        for name, data in all_holidays.items():
+            holiday_date = datetime.strptime(data["datum"], "%Y-%m-%d").date()
+            holiday_season = holidays.get_season(holiday_date)
 
-        if search_start.date() < holiday_date <= search_end:
-            date = datetime.strptime(data["datum"], '%Y-%m-%d')
-            day_name = date.strftime("%A")
-            date_converted = date.strftime('%d.%m.%Y')
+            if search_start.date() < holiday_date <= search_end:
+                date = datetime.strptime(data["datum"], '%Y-%m-%d')
+                day_name = date.strftime("%A")
+                date_converted = date.strftime('%d.%m.%Y')
 
-            if name in holidays.emojis:
-                emoji = holidays.emojis[name]
-            else:
-                emoji = holidays.seasons_emojis[holiday_season]
+                if name in holidays.emojis:
+                    emoji = holidays.emojis[name]
+                else:
+                    emoji = holidays.seasons_emojis[holiday_season]
 
-            if not data["hinweis"]:
-                text += f"{emoji} {name} am {day_name}, {date_converted}\n"
-            else:
-                text += f"{emoji} {name} am {day_name}, {date_converted}\n> _{data['hinweis']}_\n"
+                if not data["hinweis"]:
+                    text += f"{emoji} *{name}* am {day_name}, {date_converted}\n"
+                else:
+                    text += f"{emoji} *{name}* am {day_name}, {date_converted}\n> _{data['hinweis']}_\n"
+
+        if text:
+            text = f"*Anstehende Feiertage der nächsten {SEARCH_WEEKS} Wochen in {holidays.valid_states[state]}:*\n{text}"
+    else:
+        holiday_list = all_holidays.items()
+        for entry in holiday_list:
+            state = entry[0]
+            if state == "NATIONAL":
+                continue
+
+            for name, data in entry[1].items():
+                holiday_date = datetime.strptime(data["datum"], "%Y-%m-%d").date()
+                holiday_season = holidays.get_season(holiday_date)
+
+                if search_start.date() < holiday_date <= search_end:
+                    date = datetime.strptime(data["datum"], '%Y-%m-%d')
+                    day_name = date.strftime("%A")
+                    date_converted = date.strftime('%d.%m.%Y')
+
+                    if name in holidays.emojis:
+                        emoji = holidays.emojis[name]
+                    else:
+                        emoji = holidays.seasons_emojis[holiday_season]
+
+                    text += f"{emoji} *{holidays.valid_states[state]}* | *{name}* am {day_name}, {date_converted}\n"
+                    if data["hinweis"]:
+                        text += f"> _{data['hinweis']}_\n"
+
+        if text:
+            text = f"*Anstehende Feiertage der nächsten {SEARCH_WEEKS} Wochen:*\n{text}"
 
     if text:
-        text = f"*Anstehende Feiertage der nächsten {SEARCH_WEEKS} Wochen:*\n{text}"
         print(text)
         slackbot.post(channel=os.getenv("SLACK_CHANNEL", "holiday-test"), message=text)
