@@ -23,7 +23,7 @@ RUN python --version && \
 FROM base
 
 LABEL   org.opencontainers.image.description="Feiertagsbot für Slack benachrichtigt über im vorgeleten Zeitraum über bevorstehende, deutsche Feiertage" \
-        org.opencontainers.image.authors="Kim Oliver Drechsel <kim@drechsel.xyz>" \
+        org.opencontainers.image.authors="Kim Oliver Drechsel <kimoliver.drechsel@adorsys.com>" \
         org.opencontainers.image.licenses="MIT"
 
 WORKDIR /app/
