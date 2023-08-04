@@ -136,7 +136,7 @@ if __name__ == '__main__':
     search_start = datetime.today()
     search_end = search_start.date() + timerange
 
-    slack_token = os.getenv("SLACK_TOKEN", None)
+    slack_token = os.getenv("SLACK_TOKEN")
     if slack_token:
         slackbot = Slack(token=slack_token)
     else:
