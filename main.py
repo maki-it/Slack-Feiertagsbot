@@ -149,7 +149,7 @@ if __name__ == '__main__':
     all_holidays = holidays.get(year=search_end, state=state)
     text = ""
 
-    if state:
+    if state and state != "ALL":
         for name, data in all_holidays.items():
             holiday_date = datetime.strptime(data["datum"], "%Y-%m-%d").date()
             holiday_season = holidays.get_season(holiday_date)
