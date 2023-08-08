@@ -200,7 +200,7 @@ if __name__ == '__main__':
             text = f"*Anstehende Feiertage der nächsten {SEARCH_WEEKS} Wochen:*\n{text}"
 
     if text:
-        slack_channel = os.getenv("SLACK_CHANNEL", "holiday-test")
+        slack_channel = os.getenv("SLACK_CHANNEL")
         print(text)
         print(f"Send notification to Slack Channel: {slack_channel}")
         slackbot.post(channel=slack_channel, message=text)
